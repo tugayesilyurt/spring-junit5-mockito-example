@@ -1,0 +1,41 @@
+version: "3.8"
+
+services:
+
+  mysql-database:
+    image: mysql:latest
+    container_name: mysql-junit-test
+    ports:
+      - "3306:3306"
+    restart: always
+    environment:
+      MYSQL_DATABASE: test
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: 123456
+      MYSQL_ROOT_PASSWORD: 123456   
+    command: --character-set-server=utf8 --collation-server=utf8_general_ci
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks: 
+      - test-network 
+      
+  spring-test-service:
+    image: tugayesilyurt/spring-test-service
+    container_name: spring-test-service
+    build: 
+       context: ./spring-junit5-mockito-example
+       dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mysql-database
+    networks: 
+      - test-network 
+      
+volumes:
+  mysql-data:
+      driver: local
+      
+networks: 
+  test-network:
+    driver: bridge
